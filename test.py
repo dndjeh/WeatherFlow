@@ -1,32 +1,36 @@
-from kafka import KafkaProducer
-import requests
-import json
 import time
+from kafka import KafkaProducer, KafkaConsumer
+from kafka.errors import NoBrokersAvailable
 
-API_KEY = "YOUR_API_KEY"
-CITIES = ["Seoul", "New York", "Tokyo", "Paris", "Sydney"]
+# Kafka Producer 연결 시도 (재시도 로직)
+while True:
+    try:
+        producer = KafkaProducer(
+            bootstrap_servers='kafka:9092',
+            max_request_size=1500000000
+        )
+        print("Kafka broker connected!")
+        break
+    except NoBrokersAvailable:
+        print("Kafka broker not available, retrying in 5 seconds...")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+    time.sleep(5)
 
-producer = KafkaProducer(
-    bootstrap_servers='localhost:9092',
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+# Kafka Consumer 생성 및 메시지 읽기
+consumer = KafkaConsumer(
+    'your_topic_name',
+    bootstrap_servers='kafka:9092',
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    group_id='your_group_id',
+    consumer_timeout_ms=1000,
+    max_partition_fetch_bytes=1500000000,
+    fetch_max_bytes=1500000000
 )
 
-while True:
-    for city in CITIES:
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
-        res = requests.get(url)
-        data = res.json()
-
-        # 필요한 필드만 추출
-        filtered = {
-            "city": city,
-            "temp": data["main"]["temp"],
-            "humidity": data["main"]["humidity"],
-            "weather": data["weather"][0]["main"],
-            "timestamp": data["dt"]
-        }
-
-        producer.send("weather-topic", filtered)
-        print(f"✅ {city} 데이터 전송됨:", filtered)
-
-    time.sleep(60)  # 1분 간격으로 수집
+try:
+    for message in consumer:
+        print(f"Received message: {message.value}")
+finally:
+    consumer.close()
