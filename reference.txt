@@ -1,0 +1,9 @@
+# 도커로 해당 폴더 경로로 접속
+토픽 생성 :/# kafka-topics.sh --create --topic topic1 --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3
+토픽 리스트 확인: kafka-topics.sh --list --bootstrap-server localhost:9092
+토픽 상세 조회: kafka-topics.sh --describe --topic topic1 --bootstrap-server kafka:9092
+토픽 삭제: kafka-topics.sh --delete --bootstrap-server kafka:9092 --topic topic1
+
+
+
+출처 : https://9hyuk9.tistory.com/92
