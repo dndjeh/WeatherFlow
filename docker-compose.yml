@@ -1,0 +1,46 @@
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- ./kafka-data:/kafka-logs # 카프카 로그 보기
+    depends_on:
+      - zookeeper
+
+  producer:
+    build: .
+    container_name: producer
+    depends_on:
+      - kafka
+    environment:
+      API_KEY: ${API_KEY}
+    command: python producer.py
+    networks:
+      - default
+
+  consumer:
+    build: .
+    container_name: consumer
+    depends_on:
+      - kafka
+    command: python consumer.py
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
