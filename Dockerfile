@@ -1,6 +1,10 @@
 FROM python:3.10
+
 WORKDIR /app
-COPY test2.py /app
-COPY .env /app
-RUN pip install kafka-python requests python-dotenv
-CMD ["python", "test2.py"]
+
+COPY producer.py . 
+COPY consumer.py .
+COPY .env .
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
