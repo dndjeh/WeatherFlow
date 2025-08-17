@@ -9,7 +9,7 @@ while True:
             'weather-topic',                # 구독할 토픽
             bootstrap_servers='kafka:9092', # Docker 네트워크에서 Kafka 서비스 이름
             value_deserializer=lambda v: json.loads(v.decode('utf-8')), # JSON → dict
-            auto_offset_reset='earliest',   # auto_offset_reset은 Consumer가 그룹에 offset 기록이 없거나 초기화되었을 때 동작을 결정
+            auto_offset_reset='latest',   # auto_offset_reset은 Consumer가 그룹에 offset 기록이 없거나 초기화되었을 때 동작을 결정
             enable_auto_commit=True,        # 자동 커밋
             group_id='DB_group'             # 컨슈머 그룹 ID
         )
