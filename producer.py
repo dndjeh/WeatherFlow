@@ -23,6 +23,7 @@ while True:
 
 while True:
     for city in CITIES:
+        
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
         res = requests.get(url)
         data = res.json()
@@ -35,4 +36,4 @@ while True:
         }
         producer.send("weather-topic", filtered)
         print(f"✅ {city} 데이터 전송됨:", filtered, flush=True)
-    time.sleep(4)
+        time.sleep(10)
