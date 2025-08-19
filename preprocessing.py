@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col, from_unixtime, to_date
 from pyspark.sql.types import StructType, StructField, StringType, FloatType, IntegerType
 
-# 1️⃣ SparkSession 생성 (Kafka 패키지 포함)
+# SparkSession 생성 (Kafka 패키지 포함)
 spark = SparkSession.builder \
     .appName("WeatherFlowConsumerToMySQL") \
     .config(
@@ -13,7 +13,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 
-# 2️⃣ Kafka에서 읽어올 데이터의 스키마 정의
+# Kafka에서 읽어올 데이터의 스키마 정의
 schema = StructType([
     StructField("city", StringType(), True),
     StructField("temp", FloatType(), True),
@@ -22,23 +22,23 @@ schema = StructType([
     StructField("timestamp", IntegerType(), True)  # epoch 초 단위
 ])
 
-# 3️⃣ Kafka 스트리밍 데이터 읽기
+# Kafka 스트리밍 데이터 읽기
 df_stream = spark.readStream.format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9092") \
     .option("subscribe", "weather-topic") \
     .option("startingOffsets", "earliest") \
     .load()
 
-# 4️⃣ JSON 파싱 + timestamp 변환
+# JSON 파싱 + timestamp 변환
 df_json = df_stream.selectExpr("CAST(value AS STRING) as json_str") \
     .select(from_json(col("json_str"), schema).alias("data")) \
     .select("data.*") \
     .withColumn("timestamp", from_unixtime(col("timestamp")).cast("timestamp")) \
     .withColumn("timestamp", to_date(col("timestamp")))
 
-# 5️⃣ 배치 단위 처리 함수 정의 (MySQL에 저장)
+#  배치 단위 처리 함수 정의 (MySQL에 저장)
 def process_batch(batch_df, batch_id):
-    print(f"--- 배치 {batch_id} ---")
+    print(f"--- 배치 {batch_id} ---", flush=True)
     #display(batch_df.limit(10))  # 주피터 셀에서 상위 10개 확인
 
     batch_df.write \
@@ -51,12 +51,12 @@ def process_batch(batch_df, batch_id):
       .mode("append") \
       .save()
 
-# 6️⃣ 스트리밍 실행
+# 스트리밍 실행
 query = df_json.writeStream \
     .foreachBatch(process_batch) \
     .outputMode("append") \
     .option("checkpointLocation", "/tmp/weatherflow_checkpoint") \
     .start()
 
-# 7️⃣ 스트리밍 유지
+# 스트리밍 유지
 query.awaitTermination()
