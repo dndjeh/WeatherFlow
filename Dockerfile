@@ -1,4 +1,5 @@
-FROM bitnami/spark:3.5.5
+FROM python:3.11-slim 
+#bitnami/spark:3.5.5
 
 
 WORKDIR /app
@@ -9,9 +10,9 @@ COPY preprocessing.py .
 COPY .env .
 COPY requirements.txt .
 
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip python3-distutils curl procps && \
-    apt-get clean
+# RUN apt-get update && \
+#     apt-get install -y python3 python3-pip python3-distutils curl procps && \
+#     apt-get clean
 
 
 RUN pip install --no-cache-dir -r requirements.txt
