@@ -5,9 +5,13 @@ from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 
 load_dotenv()
+## 실시간 데이터
 OUTBREAK_KEY = os.getenv("OUTBREAK_KEY")    #돌발상황
 TRAFFIC_INFORMATION = os.getenv('TRAFFIC_INFORMATION')  #교통량
 RAIN_API_KEY = os.getenv('RAIN_API_KEY')    #강우량
+
+
+## 배치 데이터
 FLOOD_MAP_API_KEY = os.getenv('FLOOD_MAP_API_KEY')
 EARTHQUAKE_SHELTER_API_KEY = os.getenv('EARTHQUAKE_SHELTER_API_KEY')
 
