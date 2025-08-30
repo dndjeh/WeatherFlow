@@ -88,7 +88,7 @@ services:
       - "3307:3306"          # 로컬 3306 → 컨테이너 3306
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: weatherflow
+      MYSQL_DATABASE: toy_project
       MYSQL_USER: user
       MYSQL_PASSWORD: userpass
     volumes:
@@ -98,8 +98,30 @@ services:
     # volumes:
     #   - ./mysql-data:/var/lib/mysql
 
+  redis:
+    image: redis:7.2.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+    #command: python3 redis.py
+    restart: unless-stopped
+
+  redis-client:
+    image: python:3.11-slim
+    container_name: redis-client
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash -c "pip install redis && python redis_test.py"
+
+
   airflow:
-    image: apache/airflow:2.8.1
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow   # airflow 전용 Dockerfile
+    #image: apache/airflow:2.8.1
     container_name: airflow
     restart: unless-stopped
 
@@ -107,7 +129,7 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__FERNET_KEY: '5ozw1xClhNUKElcA31BOLTCr3f8de2whokz13dLXQ1w='
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'mysql+pymysql://user:userpass@mysql:3306/weatherflow'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'mysql+pymysql://user:userpass@mysql:3306/airflow_db'
       AIRFLOW__WEBSERVER__RBAC: 'true'
     # env_file:
     #   - .env
@@ -119,7 +141,12 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: bash -c "pip install --no-cache-dir pymysql && airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com && exec airflow webserver"
+      - ./requirements.txt:/requirements.txt
+    command: bash -c "airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com && exec airflow webserver"
+
+    #bash -c "pip install --no-cache-dir pymysql && airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com && exec airflow webserver"
+    #bash -c "pip install --no-cache-dir -r /requirements.txt && exec airflow webserver"
+    
 
 networks:
   default:
