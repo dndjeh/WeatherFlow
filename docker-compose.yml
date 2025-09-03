@@ -27,6 +27,9 @@ services:
       - kafka
     environment:
       API_KEY: ${API_KEY}
+    volumes:
+      - ./producer.py:/app/producer.py   # 로컬 producer.py → 컨테이너 /app/producer.py
+    working_dir: /app
     command: python3 producer.py
 
   consumer:
@@ -34,6 +37,9 @@ services:
     container_name: consumer
     depends_on:
       - kafka
+    volumes:
+      - ./consumer.py:/app/consumer.py   # 로컬 consumer.py → 컨테이너 /app/consumer.py
+    working_dir: /app
     command: python3 consumer.py
   
   preprocessing:
