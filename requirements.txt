@@ -1,4 +1,5 @@
 kafka-python
 requests
 python-dotenv
+Flask
 pymysql
