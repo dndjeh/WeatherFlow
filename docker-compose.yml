@@ -152,7 +152,23 @@ services:
 
     #bash -c "pip install --no-cache-dir pymysql && airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com && exec airflow webserver"
     #bash -c "pip install --no-cache-dir -r /requirements.txt && exec airflow webserver"
-    
+  
+  subway-api:
+    build: .
+    container_name: transit
+    depends_on:
+      - kafka        # Kafka 연동이 필요하면
+    environment:
+      SEOUL_SUBWAY_ARRIVAL_API_KEY: ${SEOUL_SUBWAY_ARRIVAL_API_KEY}
+      SEOUL_TRANSIT_API_KEY: ${SEOUL_TRANSIT_API_KEY}
+    volumes:
+      - ./app.py:/app/app.py       # 로컬 app.py → 컨테이너 /app/app.py
+    working_dir: /app
+    ports:
+      - "5000:5000"               # Flask API 외부 노출
+    command: python3 app.py
+    restart: unless-stopped
+
 
 networks:
   default:
