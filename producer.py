@@ -6,17 +6,22 @@ import xml.etree.ElementTree as ET
 from kafka import KafkaProducer
 from dotenv import load_dotenv
 
+'''지하철호선ID(1001:1호선, 1002:2호선, 1003:3호선, 1004:4호선, 
+1005:5호선 1006:6호선, 1007:7호선, 1008:8호선, 1009:9호선, 1063:경의중앙선,
+1065:공항철도, 1067:경춘선, 1075:수인분당선 1077:신분당선, 1092:우이신설선, 1032:GTX-A)'''
 
 load_dotenv()
 OUTBREAK_KEY = os.getenv("OUTBREAK_KEY")    # 돌발정보
 TRAFFIC_INFORMATION = os.getenv("TRAFFIC_INFORMATION") # 교통량
 RAIN_API_KEY = os.getenv("RAIN_API_KEY")    # 강우량
 
+## AccInfo, TrafficInfo 에 필요함 -> AccInfo, TrafficInfo에서 LINK_ID를 받아서 해당 api를 호출하여 정보를 반환 해야함
+LINK_ID = os.getenv("LINK_ID")
 
 ### 지하철 현재 위치는 모든 호선을 가져옴
 SEOUL_SUBWAY_POSITION_API_KEY = os.getenv("SEOUL_SUBWAY_POSITION_API_KEY") # 지하철 호선 필요 http://swopenAPI.seoul.go.kr/api/subway/(인증키)/xml/realtimePosition/(시작 페이지)/(종료페이지)/(호선) -> ex) 1호선
 
-### 링크 아이디 필요
+### 서울시 실시간 도로 소통 정보
 SEOUL_TRAFFIC_REALTIME_API_KEY = os.getenv("SEOUL_TRAFFIC_REALTIME_API_KEY") # 링크 아이디 필요 http://openapi.seoul.go.kr:8088/(인증키)/xml/TrafficInfo/(시작 페이지)/(종료페이지)/(링크 아이디) -> ex) 1220003800
 
 
@@ -26,7 +31,7 @@ if __name__ == "__main__":
         {'name': 'AccInfo', 'key': OUTBREAK_KEY, 'response_type' : 'xml'},
         {'name': 'SpotInfo', 'key': TRAFFIC_INFORMATION, 'response_type':'xml'},
         {'name': 'ListRainfallService', 'key': RAIN_API_KEY, 'response_type' : 'xml'},
-
+        {'name': 'LinkInfo', 'key': LINK_ID, 'response_type' : 'xml'},
         {'name': 'realtimePosition', 'key': SEOUL_SUBWAY_POSITION_API_KEY, 'response_type' : 'xml'},
 
         {'name': 'TrafficInfo', 'key': SEOUL_TRAFFIC_REALTIME_API_KEY, 'response_type' : 'xml'}
@@ -41,6 +46,7 @@ topic_mapping = {
     'AccInfo': 'outbreak_topic',
     'SpotInfo': 'traffic_topic',
     'ListRainfallService': 'rain_topic',
+
     'realtimeStationArrival': 'subway_arrival_topic',
     'realtimePosition': 'subway_position_topic',
     'TrafficInfoRealtime': 'realtime_traffic_topic',
