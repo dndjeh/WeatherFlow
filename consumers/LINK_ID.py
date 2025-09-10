@@ -1,9 +1,9 @@
 from kafka import KafkaConsumer
 ## 도로 Link ID
 subway_consumer = KafkaConsumer(
-    "subway_position_topic",
+    "",
     bootstrap_servers="kafka:9092",
-    group_id="subway_group",
+    group_id="LINK_group",
     auto_offset_reset="earliest",
     enable_auto_commit=True
 )

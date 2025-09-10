@@ -1,7 +1,6 @@
 from kafka import KafkaConsumer
 
 traffic_consumer = KafkaConsumer(
-    "traffic_topic", # 서울시 교통량 지점 정보
     "realtime_trafficInfo", # 서울시 실시간 도로 소통 정보
     bootstrap_servers="kafka:9092",
     group_id="traffic_group",
