@@ -32,15 +32,36 @@ services:
     working_dir: /app
     command: python3 producer.py
 
-  consumer:
+  weather-consumer:
     build: .
-    container_name: consumer
+    container_name: weather-consumer
     depends_on:
       - kafka
     volumes:
-      - ./consumer.py:/app/consumer.py   # 로컬 consumer.py → 컨테이너 /app/consumer.py
-    working_dir: /app
-    command: python3 consumer.py
+      - ./consumers:/app/consumers
+    working_dir: /app/consumers
+    command: python3 weather_consumer.py
+
+  traffic-consumer:
+    build: .
+    container_name: traffic-consumer
+    depends_on:
+      - kafka
+    volumes:
+      - ./consumers:/app/consumers
+    working_dir: /app/consumers
+    command: python3 traffic_consumer.py
+
+  subway-consumer:
+    build: .
+    container_name: subway-consumer
+    depends_on:
+      - kafka
+    volumes:
+      - ./consumers:/app/consumers
+    working_dir: /app/consumers
+    command: python3 subway_consumer.py
+
   
   preprocessing:
     image: jupyter/pyspark-notebook:latest
