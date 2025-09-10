@@ -29,7 +29,6 @@ SEOUL_TRAFFIC_REALTIME_API_KEY = os.getenv("SEOUL_TRAFFIC_REALTIME_API_KEY") # �
 if __name__ == "__main__":
     api_list = [
         {'name': 'AccInfo', 'key': OUTBREAK_KEY, 'response_type' : 'xml'},
-        {'name': 'SpotInfo', 'key': TRAFFIC_INFORMATION, 'response_type':'xml'},
         {'name': 'ListRainfallService', 'key': RAIN_API_KEY, 'response_type' : 'xml'},
         {'name': 'LinkInfo', 'key': LINK_ID, 'response_type' : 'xml'},
         {'name': 'realtimePosition', 'key': SEOUL_SUBWAY_POSITION_API_KEY, 'response_type' : 'xml'},
@@ -44,7 +43,6 @@ lines = ['1호선', '2호선', '3호선', '4호선', '5호선', '6호선', '7호
 # -----------------------------
 topic_mapping = {
     'AccInfo': 'outbreak_topic',
-    'SpotInfo': 'traffic_topic',
     'ListRainfallService': 'rain_topic',
 
     'realtimeStationArrival': 'subway_arrival_topic',
