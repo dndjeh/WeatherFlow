@@ -31,7 +31,7 @@ def get_arrival():
     if not station_name:
         return jsonify({"error": "station query parameter required"}), 400
 
-    url = f"http://swopenAPI.seoul.go.kr/api/subway/{SEOUL_SUBWAY_ARRIVAL_API_KEY}/xml/realtimeStationArrival/1/500/{station_name}"
+    url = f"http://swopenAPI.seoul.go.kr/api/subway/{SEOUL_SUBWAY_ARRIVAL_API_KEY}/xml/realtimeStationArrival/1/100/{station_name}"
 
     try:
         response = requests.get(url, timeout=10)
@@ -99,7 +99,7 @@ def parse_transfer_xml(xml_str):
 # -----------------------------
 # 환승 경로 조회
 # -----------------------------
-## http://localhost:5000/transfer?start=신림end=영등포&transport=bus
+## http://localhost:5000/transfer?start=신림&end=영등포&transport=bus
 @app.route('/transfer', methods=['GET'])
 def get_transfer_info():
     start_name = request.args.get('start')
