@@ -131,7 +131,7 @@ def get_transfer_info():
         }
 
         response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
+        response.raise_for_status() # 오류 발생시 예외 발생
 
         transfer_data = parse_transfer_xml(response.text)  # 공통 파서 사용
 
